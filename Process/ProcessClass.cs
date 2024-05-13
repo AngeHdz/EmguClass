@@ -62,7 +62,7 @@ namespace EmguClass.Process
                 {
                     string key = string.Empty;
                     float acc = 0;
-                    model.Test(ImageToByteArray(train),ref key,ref acc);
+                    model.Test(VisionClass.ImageToByteArray(train),ref key,ref acc);
                     TestResults.AddLast(new StringResult(TestResults.Count, $"{d.TestName} - ML Result", d.Name, key, "IA result"));
                     OnReportReached(new ProcessEventArgs(TestResults.Last.Value));
                     TestResults.AddLast(new NumericResult(TestResults.Count, $"{d.TestName} - ML Result Percentage", 80, 100, acc * 100, "Pattern Score"));
@@ -97,17 +97,17 @@ namespace EmguClass.Process
             train.Save($"{path}{currentTime.ToString("yyyyMMdd_HHmmss")}.jpg");
         }
 
-        protected static byte[] ImageToByteArray(Image<Bgr, byte> image)
-        {
-            using (MemoryStream ms = new MemoryStream())
-            {
-                // Guardar la imagen en formato JPEG en el MemoryStream
-                image.ToBitmap().Save(ms, ImageFormat.Jpeg);
+        //protected static byte[] ImageToByteArray(Image<Bgr, byte> image)
+        //{
+        //    using (MemoryStream ms = new MemoryStream())
+        //    {
+        //        // Guardar la imagen en formato JPEG en el MemoryStream
+        //        image.ToBitmap().Save(ms, ImageFormat.Jpeg);
 
-                // Convertir el MemoryStream a un array de bytes
-                return ms.ToArray();
-            }
-        }
+        //        // Convertir el MemoryStream a un array de bytes
+        //        return ms.ToArray();
+        //    }
+        //}
 
         protected virtual void OnReportReached(ProcessEventArgs e) 
         {

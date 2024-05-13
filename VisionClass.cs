@@ -112,6 +112,23 @@ namespace EmguClass
 
         #region PatternMatch
 
+        public static Bitmap PatternMatch(Bitmap originalImage, Bitmap templateImage, int MinScore, Rectangle Roi, string name, bool save, out int score, ref Bitmap TrainImage) 
+        {
+            Image<Bgr, byte> newImage = new Image<Bgr, byte>(0,0);
+            Image<Bgr, byte> ori = originalImage.ToImage<Bgr, byte>();
+            Image<Bgr, byte> tem = templateImage.ToImage<Bgr, byte>();
+
+            Bitmap res = PatternMatch(ori, tem, MinScore, Roi, name, save, out score,ref newImage).ToBitmap();
+            if (score > 800) 
+            {
+                TrainImage = newImage.ToBitmap();
+            } 
+            newImage = null;
+            ori = null;
+            tem = null;
+            return res;
+        }
+
         public static Image<Bgr, byte> PatternMatch(Image<Bgr, byte> originalImage, Image<Bgr, byte> templateImage, int MinScore, Rectangle Roi, string name, bool save, out int score, ref Image<Bgr, byte> TrainImage)
         {
             Image<Bgr, byte> NewImage = originalImage;
@@ -231,6 +248,7 @@ namespace EmguClass
 
         public static Bitmap DrawRoi(Bitmap bitmap, Rectangle rect, string Name) 
         {
+            if (bitmap == null) return null;
             try 
             {
                 Image<Bgr,byte> image = bitmap.ToImage<Bgr,byte>();
@@ -241,6 +259,18 @@ namespace EmguClass
             catch (Exception e) 
             {
                 return null;
+            }
+        }
+
+        public static byte[] ImageToByteArray(Image<Bgr, byte> image)
+        {
+            using (MemoryStream ms = new MemoryStream())
+            {
+                // Guardar la imagen en formato JPEG en el MemoryStream
+                image.ToBitmap().Save(ms, ImageFormat.Jpeg);
+
+                // Convertir el MemoryStream a un array de bytes
+                return ms.ToArray();
             }
         }
 
