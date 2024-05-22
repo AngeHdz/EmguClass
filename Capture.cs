@@ -8,11 +8,13 @@ using System.Threading.Tasks;
 
 namespace EmguClass
 {
-    public static class Capture
+    public class Capture
     {
-        public static Bitmap capture()
-        {
-            return VisionClass.capture().ToBitmap();
-        }
+        //public 
+
+        //public static Bitmap capture()
+        //{
+        //    return VisionClass.capture().ToBitmap();
+        //}
     }
 }

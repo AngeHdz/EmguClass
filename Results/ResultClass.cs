@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace EmguClass.Results
 {
-    public abstract class Result
+    public abstract class ResultClass
     {
         public int Id { get; set; }
         public string Name { get; set; }
@@ -17,7 +17,7 @@ namespace EmguClass.Results
         public abstract string[] ResultInfo();
 
 
-        public Result(int id,string name, string description = "")
+        public ResultClass(int id,string name, string description = "")
         {
             Id = id;
             Name = name;

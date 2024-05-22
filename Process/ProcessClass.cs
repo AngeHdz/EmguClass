@@ -19,7 +19,7 @@ namespace EmguClass.Process
     public abstract class ProcessClass
     {
         private MLModel model;
-        public LinkedList<Result> TestResults = new LinkedList<Result>();
+        public LinkedList<ResultClass> TestResults = new LinkedList<ResultClass>();
         public List<ImageResult> imageResults = new List<ImageResult>();
 
         public event EventHandler<ProcessEventArgs> OnReport;

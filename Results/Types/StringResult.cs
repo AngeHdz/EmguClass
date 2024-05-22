@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace EmguClass.Results.Types
 {
-    public class StringResult : Result
+    public class StringResult : ResultClass
     {
         public string Meas {  get; set; }
         public string Limit { get; set; }

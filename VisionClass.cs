@@ -15,6 +15,8 @@ using static System.Net.Mime.MediaTypeNames;
 using System.Text.RegularExpressions;
 using System.ComponentModel;
 using static Tensorflow.Summary.Types;
+using MLClass;
+using System.Xml.Linq;
 
 namespace EmguClass 
 {
@@ -128,6 +130,55 @@ namespace EmguClass
             tem = null;
             return res;
         }
+        public static Image<Bgr, byte> PatternMatch(Image<Bgr, byte> originalImage, string templateImage, int MinScore, Rectangle Roi, string name, bool save, string ModelProject,out int score, ref Image<Bgr, byte> TrainImage,ref MLModel model,ref string key, ref float acc)
+        {
+            return PatternMatch(originalImage, new Image<Bgr,byte>(templateImage), MinScore, Roi, name, save, ModelProject, out score,ref TrainImage, ref model,ref key, ref acc);
+        }
+
+        public static Image<Bgr, byte> PatternMatch(Image<Bgr, byte> originalImage, Image<Bgr, byte> templateImage, int MinScore, Rectangle Roi, string name, bool save, string ModelProject, out int score, ref Image<Bgr, byte> TrainImage, ref MLModel model, ref string key, ref float acc)
+        {
+            Image<Bgr, byte> NewImage = originalImage;
+            originalImage.ROI = Roi;
+            if (originalImage.IsROISet) { }
+            score = 0;
+            using (Image<Gray, float> result = originalImage.MatchTemplate(templateImage, TemplateMatchingType.CcoeffNormed))
+            {
+                double[] minValues, maxValues;
+                Point[] minLocations, maxLocations;
+                originalImage.ROI = new Rectangle(0, 0, 0, 0);
+                result.MinMax(out minValues, out maxValues, out minLocations, out maxLocations);
+
+                if (maxLocations.Length < 1)
+                {
+                    return null;
+                }
+                // The location of the best match
+                Point location = maxLocations[0];
+                score = (int)Math.Round(maxValues[0] * 1000);
+
+                // Optionally, if you want to get the location in the original image
+                Point locationInOriginalImage = new Point(Roi.X + location.X, Roi.Y + location.Y);
+
+                // Draw a rectangle around the found area
+                Rectangle rect = new Rectangle(locationInOriginalImage, templateImage.Size);
+                if (score >= MinScore)
+                {
+                    
+                    //if (save) saveForTraining(image: originalImage.Copy(), name, rect);
+                    Image<Bgr, byte> train = originalImage.Copy();
+                    train.ROI = rect;
+                    TrainImage = train.Copy();
+                    
+                    model.Test(VisionClass.ImageToByteArray(TrainImage), ref key, ref acc, ModelProject);
+                    NewImage.Draw(rect, new Bgr(Color.Red), 4);
+                    CvInvoke.PutText(NewImage, key, new Point(rect.X, rect.Y - 10), FontFace.HersheyComplex, 1, new MCvScalar(0, 0, 255), 2);
+                }
+
+                CvInvoke.PutText(NewImage, name, new Point(Roi.X, Roi.Y - 10), FontFace.HersheyComplex, 1, new MCvScalar(0, 255, 0), 2);
+                NewImage.Draw(Roi, new Bgr(Color.Green), 4);
+                return NewImage;
+            }
+        }
 
         public static Image<Bgr, byte> PatternMatch(Image<Bgr, byte> originalImage, Image<Bgr, byte> templateImage, int MinScore, Rectangle Roi, string name, bool save, out int score, ref Image<Bgr, byte> TrainImage)
         {
@@ -184,7 +235,7 @@ namespace EmguClass
         {
             try
             {
-                VideoCapture capture = new VideoCapture(0);
+                VideoCapture capture = new VideoCapture(CamNum);
                 Mat frame = new Mat();
                 frame = capture.QueryFrame();
                 return frame.ToImage<Bgr, byte>().ToBitmap();
@@ -228,17 +279,50 @@ namespace EmguClass
 
         public static Bitmap Ambar_DarkBackground(Bitmap Image)
         {
+            if (Image == null) return null; 
             try
-            {   Image<Bgr,byte> SnapImage = Image.ToImage<Bgr, byte>();
-                Image<Hsv, byte> Snap = Image.ToImage<Hsv, byte>();
-                Snap = Snap.SmoothMedian(7);
-                ColorE filter = ColorE.GetLimits(ColorType.ambar);
-                var Mask = Snap.InRange(filter.Low, filter.High);
-                Mask = Mask.Erode(1);
-                Mask = Mask.Dilate(1);
-                Mask = VisionClass.FindContours(ref Mask, 100, true);
+            {
+                using (Image<Bgr, byte> SnapImage = Image.ToImage<Bgr, byte>().Copy())
+                {
+                    Image<Hsv, byte> Snap = Image.ToImage<Hsv, byte>().Copy();
+                    Snap = Snap.SmoothMedian(7);
+                    ColorE filter = ColorE.GetLimits(ColorType.ambar);
+                    var Mask = Snap.InRange(filter.Low, filter.High);
+                    Mask = Mask.Erode(1);
+                    Mask = Mask.Dilate(1);
+                    Mask = VisionClass.FindContours(ref Mask, 100, true);
+                    Snap.Dispose();
+                    Bitmap Result = Mask.Convert<Bgr, byte>().And(SnapImage).ToBitmap();
+                    Mask.Dispose();
+                    SnapImage.Dispose();
+                    return Result;
+                }
+            }
+            catch (Exception e)
+            {
+                return null;
+            }
+        }
 
-                return Mask.Convert<Bgr, byte>().And(SnapImage).ToBitmap();
+        public static Image<Bgr, byte> Ambar_DarkBackground(Image<Bgr,byte> Image)
+        {
+            try
+            {
+                using (Image<Bgr, byte> SnapImage = Image.Copy())
+                {
+                    Image<Hsv, byte> Snap = Image.Convert<Hsv,byte>();
+                    Snap = Snap.SmoothMedian(7);
+                    ColorE filter = ColorE.GetLimits(ColorType.ambar);
+                    var Mask = Snap.InRange(filter.Low, filter.High);
+                    Mask = Mask.Erode(1);
+                    Mask = Mask.Dilate(1);
+                    Mask = VisionClass.FindContours(ref Mask, 100, true);
+                    Snap.Dispose();
+                    Image<Bgr, byte> Result = Mask.Convert<Bgr, byte>().And(SnapImage);
+                    Mask.Dispose();
+                    SnapImage.Dispose();
+                    return Result;
+                }
             }
             catch (Exception e)
             {

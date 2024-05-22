@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace EmguClass.Results.Types
 {
-    public class NumericResult : Result
+    public class NumericResult : ResultClass
     {
         public double LowLimit {  get; set; }
         public double HighLimit { get; set; }

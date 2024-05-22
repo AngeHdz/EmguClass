@@ -9,9 +9,9 @@ namespace EmguClass.Args
 {
     public class ProcessEventArgs : EventArgs
     {
-        public Result _result;
+        public ResultClass _result;
 
-        public ProcessEventArgs(Result result) 
+        public ProcessEventArgs(ResultClass result) 
         {
             _result = result;
         }

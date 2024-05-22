@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace EmguClass.Results.Types
 {
-    public class BooleanResult :Result
+    public class BooleanResult :ResultClass
     {
         public bool Meas {  get; set; }
         public BooleanResult(int id,string name,bool meas, string description = ""): base(id,name, description) 
