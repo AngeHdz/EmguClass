@@ -1,4 +1,5 @@
 ﻿using Emgu.CV;
+using Emgu.CV.CvEnum;
 using Emgu.CV.Structure;
 using EmguClass.Args;
 using System;
@@ -20,7 +21,7 @@ namespace EmguClass.Camera
     {
         public event EventHandler<CaptureArgs> OnCapture;
         private VideoCapture _capture;
-        private bool _captureInProgress;
+        public bool _captureInProgress;
         Mat frame = new Mat();
         private int CameraID { get; set; } = cameraID;
 
@@ -28,11 +29,20 @@ namespace EmguClass.Camera
         {
             try
             {
-                _capture = new VideoCapture(CameraID);
-                _capture.ImageGrabbed += ProcessFrame;
-                _capture.Start();
+                if(_capture == null)
+                {
+                    _capture = new VideoCapture(CameraID);
+                    _capture.ImageGrabbed += ProcessFrame;
+                    _capture.Start();
+                    _captureInProgress = true;
+                }
+                else
+                {
+                    _capture.Start();
+                    _captureInProgress = true;
+                }
             }
-            catch (NullReferenceException e)
+            catch (NullReferenceException)
             {
                 return;
             }
@@ -49,12 +59,21 @@ namespace EmguClass.Camera
             OnCaptureReached(new(frame.ToImage<Bgr, byte>()));
         }
 
+        public void PauseCapture()
+        {
+            if (_capture != null && _captureInProgress == true)
+            {
+                _capture.Pause();
+                _captureInProgress = false;
+            }
+        }
+
         public void StopCapture() 
         {
-            if (_capture != null)
+            if (_capture != null && _captureInProgress == true)
             {
                 _capture.Stop();
-                _capture.Dispose();
+                _captureInProgress = false;
             }
         }
 
@@ -66,6 +85,7 @@ namespace EmguClass.Camera
         public void Dispose()
         {
             StopCapture();
+            _capture?.Dispose();
         }
     }
 }
