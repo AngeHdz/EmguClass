@@ -10,11 +10,5 @@ namespace EmguClass
 {
     public class Capture
     {
-        //public 
-
-        //public static Bitmap capture()
-        //{
-        //    return VisionClass.capture().ToBitmap();
-        //}
     }
 }

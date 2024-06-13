@@ -1,12 +1,6 @@
 ﻿using Emgu.CV;
 using Emgu.CV.Structure;
 using EmguClass.Resources.Setting;
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace EmguClass.Dictionary
 {
@@ -18,7 +12,12 @@ namespace EmguClass.Dictionary
             {
                 { t => t == TypeProcess.SmoothMedian, new SmoothMedianProcess() },
                 { t => t == TypeProcess.SmoothBlur, new SmoothBlurProcess() },
-                { t => t == TypeProcess.SmoothGaussian, new GaussianProcess() }
+                { t => t == TypeProcess.SmoothGaussian, new GaussianProcess() },
+                { t => t == TypeProcess.SmoothBilateral, new SmoothBilateralProcess() },
+                { t => t == TypeProcess.Erode, new ErodeProcess() },
+                { t => t == TypeProcess.Dilate, new DilateProcess() },
+                { t => t == TypeProcess.Led_Ambar, new LedAmbarProcess() },
+                { t => t == TypeProcess.Canny, new Cannyprocess() }
             };
 
             var operation = actions.ToList().Find(d => d.Key(Data.Type)).Value;
@@ -27,6 +26,4 @@ namespace EmguClass.Dictionary
             return ResultImage;
         }
     }
-
-    
 }

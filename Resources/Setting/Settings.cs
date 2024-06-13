@@ -14,12 +14,24 @@ namespace EmguClass.Resources.Setting
         public int Height { get; set; }
         public int KernelSize { get; set; }
 
+        public int kernelSize {  get; set; }
+        public int colorSigma {  get; set; }
+        public int spaceSigma { get; set; }
+
+        public int xorder { get; set; }
+        public int yorder { get; set; }
+        public int apertureSize { get; set; }
+
+        public double tresh { get; set; }
+        public double treshLinking { get; set; }
+        public bool I2Gradient {  get; set; }
+
         public TypeProcess Type { get; set; } = TypeProcess.None;
 
-        public Settings(int size)
-        {
-            Size = size;
-        }
+        //public Settings(int size)
+        //{
+        //    Size = size;
+        //}
 
         public Settings() { }
     }

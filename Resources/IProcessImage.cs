@@ -24,9 +24,9 @@ namespace EmguClass.Resources
 
     public static class ProcessImage
     {
-        public static IProcessImage Crear(ProcessImageTypes type, Bitmap Image, string Name, ISettings data) 
+        public static IProcessImage Crear(ProcessImageTypes type, Bitmap Image, string Name, ISettings data)
         {
-            switch (type) 
+            switch (type)
             {
                 case ProcessImageTypes.SmootMedian:
                     return new SmoothMedian(Name, data);
